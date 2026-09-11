@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estrategista de Quadros</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #E3E0D3;
+    --bg-2: #D9D5C5;
+    --surface: #FAF8F1;
+    --surface-2: #EFEBDD;
+    --ink: #1C1B15;
+    --ink-soft: #58543F;
+    --ink-faint: #86816A;
+    --line: #CDC7AE;
+    --line-strong: #B4AC8B;
+    --accent: #DA3B1A;
+    --accent-ink: #FFF9F0;
+    --accent-soft: #F3DBCF;
+    --accent-2: #1E6E5A;
+    --accent-2-ink: #F1FBF4;
+    --accent-2-soft: #D6E9DD;
+    --gold: #B4842A;
+    --gold-soft: #EBDCB6;
+    --danger: #B0281A;
+    --shadow: 0 1px 0 rgba(28,27,21,0.05);
+    --focus: #1E6E5A;
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16150F;
+      --bg-2: #0F0E0A;
+      --surface: #1F1D15;
+      --surface-2: #29271C;
+      --ink: #ECE7D6;
+      --ink-soft: #B3AC90;
+      --ink-faint: #837D65;
+      --line: #3A3627;
+      --line-strong: #4C4732;
+      --accent: #FF7A4A;
+      --accent-ink: #1A0F09;
+      --accent-soft: #3E2417;
+      --accent-2: #56C79E;
+      --accent-2-ink: #08211A;
+      --accent-2-soft: #17342A;
+      --gold: #E4BC64;
+      --gold-soft: #3A2F13;
+      --danger: #FF8069;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16150F;
+    --bg-2: #0F0E0A;
+    --surface: #1F1D15;
+    --surface-2: #29271C;
+    --ink: #ECE7D6;
+    --ink-soft: #B3AC90;
+    --ink-faint: #837D65;
+    --line: #3A3627;
+    --line-strong: #4C4732;
+    --accent: #FF7A4A;
+    --accent-ink: #1A0F09;
+    --accent-soft: #3E2417;
+    --accent-2: #56C79E;
+    --accent-2-ink: #08211A;
+    --accent-2-soft: #17342A;
+    --gold: #E4BC64;
+    --gold-soft: #3A2F13;
+    --danger: #FF8069;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 0 20px 96px;
+  }
+  a { color: inherit; }
+  h1, h2, h3 { font-family: 'Archivo', 'Work Sans', sans-serif; font-weight: 800; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+
+  /* ---------- Top bar ---------- */
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 28px 0 22px; border-bottom: 1px solid var(--line); }
+  .mark { width: 34px; height: 34px; flex: none; }
+  .brand-text { display: flex; flex-direction: column; gap: 2px; }
+  .brand-name { font-size: 1.05rem; font-weight: 900; letter-spacing: 0.02em; }
+  .brand-tag { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ---------- Intro ---------- */
+  .intro { padding: 32px 0 4px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 5px 12px 5px 10px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  /* ---------- Form shell ---------- */
+  .production-sheet {
+    margin-top: 34px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden;
+  }
+
+  .sheet-body { padding: 24px 22px 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+  @media (max-width: 760px) { .sheet-body { grid-template-columns: 1fr; } }
+
+  .col-title {
+    grid-column: 1 / -1; display: flex; align-items: baseline; gap: 10px; margin: 22px 0 4px;
+  }
+  .col-title:first-child { margin-top: 0; }
+  .col-title h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.10em; color: var(--ink-faint); }
+  .col-title .rule { flex: 1; height: 1px; background: var(--line); }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; }
+  .field .req { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em; color: var(--accent-ink); background: var(--accent); border-radius: 4px; padding: 2px 6px; text-transform: uppercase; }
+  .field .opt { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em; color: var(--ink-faint); border: 1px solid var(--line-strong); border-radius: 4px; padding: 1px 6px; text-transform: uppercase; }
+  .field .hint { font-size: 0.78rem; color: var(--ink-faint); margin-top: 4px; }
+  textarea, input[type="text"] {
+    width: 100%; background: var(--bg); color: var(--ink); border: 1px solid var(--line-strong);
+    border-radius: 8px; padding: 10px 12px; font-family: 'Work Sans', sans-serif; font-size: 0.92rem;
+    resize: vertical; min-height: 84px;
+  }
+  textarea:focus, input:focus, button:focus-visible, .file-drop:focus-within {
+    outline: 2px solid var(--focus); outline-offset: 1px;
+  }
+  textarea.small { min-height: 64px; }
+
+  .file-drop {
+    border: 1.5px dashed var(--line-strong); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px;
+    background: var(--bg);
+  }
+  .file-drop .fbtn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+    background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 6px; padding: 8px 12px; cursor: pointer;
+    flex: none; color: var(--ink);
+  }
+  .file-drop .fbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .file-status { font-size: 0.82rem; color: var(--ink-faint); }
+  .file-status.ok { color: var(--accent-2); }
+  .file-status.err { color: var(--danger); }
+  input[type="file"] { display: none; }
+
+  .sheet-foot {
+    padding: 20px 22px 26px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .go-btn {
+    font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 0.92rem; letter-spacing: 0.02em;
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 9px; padding: 14px 24px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: transform .12s ease, opacity .12s ease;
+  }
+  .go-btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .go-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .go-btn .rec { width: 9px; height: 9px; border-radius: 50%; background: var(--accent-ink); }
+  .go-note { font-size: 0.8rem; color: var(--ink-faint); }
+  .form-error { color: var(--danger); font-size: 0.85rem; }
+
+  /* ---------- Loading ---------- */
+  .tuning { display: none; align-items: center; gap: 14px; padding: 26px 22px; border-top: 1px solid var(--line); }
+  .tuning.on { display: flex; }
+  .tuning-bars { display: flex; align-items: flex-end; gap: 3px; height: 22px; }
+  .tuning-bars i { width: 4px; background: var(--accent-2); border-radius: 2px; animation: bar 1.05s ease-in-out infinite; }
+  .tuning-bars i:nth-child(1){height:40%;animation-delay:0s}
+  .tuning-bars i:nth-child(2){height:90%;animation-delay:.12s}
+  .tuning-bars i:nth-child(3){height:60%;animation-delay:.24s}
+  .tuning-bars i:nth-child(4){height:100%;animation-delay:.36s}
+  .tuning-bars i:nth-child(5){height:50%;animation-delay:.48s}
+  @keyframes bar { 0%,100%{ transform: scaleY(0.4);} 50%{ transform: scaleY(1);} }
+  @media (prefers-reduced-motion: reduce) { .tuning-bars i { animation: none; height: 70%; } }
+  .tuning-text { font-size: 0.9rem; color: var(--ink-soft); }
+  .tuning-text b { color: var(--ink); }
+
+  /* ---------- Results ---------- */
+  #results { display: none; margin-top: 44px; }
+  #results.on { display: block; }
+  .section-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; }
+  .section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--accent); }
+  .section-head h2 { font-size: 1.3rem; }
+  .section-desc { color: var(--ink-faint); font-size: 0.86rem; margin: -10px 0 20px; max-width: 62ch; }
+
+  .dossier { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 620px) { .dossier { grid-template-columns: 1fr; } }
+  .dossier-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .dossier-panel h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin: 0 0 10px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; font-size: 0.82rem; }
+  .chip.quote { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; }
+  .plain-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .plain-list li { font-size: 0.86rem; color: var(--ink-soft); padding-left: 14px; position: relative; }
+  .plain-list li::before { content: "—"; position: absolute; left: 0; color: var(--ink-faint); }
+
+  .tension-row {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+  }
+  @media (max-width: 560px) { .tension-row { grid-template-columns: 1fr; } }
+  .tension-side { font-size: 0.84rem; }
+  .tension-side .k { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 2px; }
+  .tension-side.want .k { color: var(--accent-2); }
+  .tension-side.fear .k { color: var(--accent); }
+  .tension-zig { width: 34px; height: 14px; flex: none; justify-self: center; }
+  @media (max-width: 560px) { .tension-zig { transform: rotate(90deg); justify-self: start; margin-left: 4px; } }
+
+  /* ---------- Quadro cards ---------- */
+  .quadros-list { display: grid; gap: 18px; }
+  .quadro-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px 26px; }
+  .qc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 6px; flex-wrap: wrap; }
+  .qc-id { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--accent); letter-spacing: 0.04em; }
+  .qc-name { font-size: 1.3rem; margin-top: 2px; }
+  .novela-tag {
+    display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); border-radius: 999px;
+    padding: 4px 10px 4px 8px; flex: none;
+  }
+  .novela-tag svg { width: 12px; height: 12px; }
+  .qc-concept { color: var(--ink-soft); font-size: 1rem; margin: 6px 0 18px; max-width: 68ch; }
+
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin: 4px 0 20px; overflow-x: auto; }
+  .pipe-node {
+    flex: 1 1 0; min-width: 132px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; position: relative;
+  }
+  .pipe-node .pk { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent-2); display: block; margin-bottom: 4px; }
+  .pipe-node .pv { font-size: 0.82rem; line-height: 1.35; }
+  .pipe-arrow { flex: none; width: 22px; display: flex; align-items: center; justify-content: center; color: var(--ink-faint); }
+  .pipe-arrow svg { width: 16px; height: 16px; }
+  @media (max-width: 700px) {
+    .pipeline { flex-direction: column; }
+    .pipe-arrow { width: 100%; height: 18px; transform: rotate(90deg); }
+    .pipe-node { min-width: 0; }
+  }
+
+  .qc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; margin-bottom: 18px; }
+  @media (max-width: 640px) { .qc-grid { grid-template-columns: 1fr; } }
+  .qc-field .k { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); margin-bottom: 4px; }
+  .qc-field .v { font-size: 0.88rem; color: var(--ink); }
+
+  .episodes { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .episodes h5 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin: 0 0 10px; }
+  .episodes ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .episodes li { display: flex; gap: 10px; font-size: 0.88rem; }
+  .ep-num { font-family: 'IBM Plex Mono', monospace; color: var(--accent-2); flex: none; }
+
+  /* ---------- Refinement ---------- */
+  .refine-box { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 14px; padding: 22px 24px; margin-top: 30px; }
+  .refine-box h3 { font-size: 1.02rem; margin-bottom: 8px; }
+  .refine-box p.lead { font-size: 0.88rem; color: var(--ink-soft); margin: 0 0 14px; }
+  .refine-box .plain-list li { color: var(--ink); }
+  .refine-box textarea { margin-top: 12px; background: var(--surface); }
+  .refine-actions { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+  .ghost-btn {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;
+    background: transparent; border: 1px solid var(--ink); color: var(--ink); border-radius: 8px; padding: 10px 16px; cursor: pointer;
+  }
+  .ghost-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .solid-btn {
+    font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 0.86rem; background: var(--accent); color: var(--accent-ink);
+    border: none; border-radius: 8px; padding: 11px 18px; cursor: pointer;
+  }
+  .solid-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .tools-row { display: flex; align-items: center; gap: 14px; margin-top: 34px; flex-wrap: wrap; }
+  .result-error { background: var(--surface); border: 1px solid var(--danger); color: var(--danger); border-radius: 10px; padding: 14px 16px; font-size: 0.88rem; margin-top: 20px; }
+
+  footer.note { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 0.78rem; color: var(--ink-faint); max-width: 62ch; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <svg class="mark" viewBox="0 0 34 34" fill="none">
+      <rect x="1" y="1" width="32" height="32" rx="7" stroke="var(--ink)" stroke-width="1.4"/>
+      <path d="M8 12V9.5C8 8.67 8.67 8 9.5 8H12" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M26 12V9.5C26 8.67 25.33 8 24.5 8H22" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M8 22V24.5C8 25.33 8.67 26 9.5 26H12" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M26 22V24.5C26 25.33 25.33 26 24.5 26H22" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="17" cy="17" r="4.2" fill="var(--accent)"/>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-name">ESTRATEGISTA DE QUADROS</span>
+      <span class="brand-tag">Grade de programação para o seu Instagram</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    <span class="eyebrow"><span class="dot"></span> Ferramenta de estratégia de conteúdo</span>
+  </div>
+
+  <form class="production-sheet" id="form" novalidate>
+    <div class="sheet-body">
+      <div class="col-title"><h3>Material obrigatório</h3><span class="rule"></span></div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="cliente-file">Cliente Ideal Expandido <span class="req">obrigatório</span></label>
+        <div class="file-drop">
+          <button type="button" class="fbtn" id="file-btn">Escolher arquivo</button>
+          <input type="file" id="cliente-file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          <span class="file-status" id="file-status">Nenhum arquivo — PDF ou DOCX</span>
+        </div>
+        <div class="hint">O texto extraído aparece na caixa abaixo. Não conseguiu enviar o arquivo? Cole o conteúdo diretamente.</div>
+        <textarea id="cliente-texto" placeholder="O conteúdo do seu documento de Cliente Ideal Expandido aparece aqui após o upload — ou cole manualmente." style="margin-top:10px;"></textarea>
+      </div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="detalhamento">Detalhamento do Cliente Ideal <span class="req">obrigatório</span></label>
+        <div class="hint">Momento de vida, contexto financeiro e familiar, desejos, medos, objeções, hábitos, linguagem — o que você já sabe sobre essa pessoa.</div>
+        <textarea id="detalhamento" placeholder="Ex: Mulheres de 35–50 anos, classe média-alta, que já reformaram a casa antes e se decepcionaram com um profissional..."></textarea>
+      </div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="essencia">Essência <span class="req">obrigatório</span></label>
+        <div class="hint">Por que você faz esse trabalho, o que é inegociável, o que te irrita no mercado, que bandeiras você defende ou rejeita.</div>
+        <textarea id="essencia" placeholder="Ex: Não aceito clientes que só querem o preço mais baixo. Acredito que..."></textarea>
+      </div>
+
+      <div class="col-title"><h3>Material extra (opcional, mas ajuda muito)</h3><span class="rule"></span></div>
+
+      <div class="field">
+        <label for="jornada">Jornada do Herói <span class="opt">opcional</span></label>
+        <textarea class="small" id="jornada" placeholder="Antes, durante e depois: como você começou, o que deu errado, o que mudou."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="posicionamento">Posicionamento <span class="opt">opcional</span></label>
+        <textarea class="small" id="posicionamento" placeholder="Como você quer ser vista no mercado, frente a quem compete."></textarea>
+      </div>
+
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="info-adicional">Informações adicionais relevantes <span class="opt">opcional</span></label>
+        <div class="hint">Entrevistas, depoimentos, conteúdos anteriores ou qualquer outro material que ajude a ferramenta a entender melhor a marca e o Cliente Ideal.</div>
+        <textarea id="info-adicional" placeholder="Cole aqui trechos de entrevistas, depoimentos de clientes, o que já funcionou (ou não) nas suas redes, ou qualquer outro contexto relevante."></textarea>
+      </div>
+    </div>
+
+    <div class="tuning" id="tuning">
+      <div class="tuning-bars"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="tuning-text" id="tuning-text">Sintonizando… lendo seu material e procurando contradições.</div>
+    </div>
+
+    <div class="sheet-foot">
+      <button type="submit" class="go-btn" id="go-btn" disabled>
+        <span class="rec"></span> GERAR GRADE DE QUADROS
+      </button>
+      <span class="go-note" id="go-note">Preencha os 3 campos obrigatórios para liberar.</span>
+    </div>
+  </form>
+
+  <div id="results"></div>
+
+  <footer class="note">As sugestões são geradas por IA a partir apenas do que você escreveu acima — vale revisar antes de gravar. Nada do que você digita aqui fica salvo se você recarregar a página; use “Baixar relatório” para guardar o resultado.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.12.2/mammoth.browser.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // ---------- helpers ----------
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function cap(str, max) {
+    str = (str || "").trim();
+    if (str.length <= max) return str;
+    return str.slice(0, max) + "\n[...conteúdo truncado por limite de tamanho...]";
+  }
+  function el(id) { return document.getElementById(id); }
+
+  // ---------- field wiring ----------
+  var REQUIRED_IDS = ["cliente-texto", "detalhamento", "essencia"];
+  var OPTIONAL_IDS = ["jornada", "posicionamento", "info-adicional"];
+
+  function updateProgress() {
+    var filledReq = REQUIRED_IDS.filter(function (id) { return el(id).value.trim().length > 0; }).length;
+    var ok = filledReq === 3;
+    el("go-btn").disabled = !ok;
+    el("go-note").textContent = ok
+      ? "Pronto. Quanto mais campos extras, mais específico o resultado."
+      : "Preencha os 3 campos obrigatórios para liberar.";
+  }
+  REQUIRED_IDS.concat(OPTIONAL_IDS).forEach(function (id) {
+    el(id).addEventListener("input", updateProgress);
+  });
+  updateProgress();
+
+  // ---------- file extraction ----------
+  el("file-btn").addEventListener("click", function () { el("cliente-file").click(); });
+
+  async function extractPdf(file) {
+    var buf = await file.arrayBuffer();
+    var doc = await window.pdfjsLib.getDocument({ data: buf }).promise;
+    var pages = Math.min(doc.numPages, 80);
+    var out = [];
+    for (var i = 1; i <= pages; i++) {
+      var page = await doc.getPage(i);
+      var content = await page.getTextContent();
+      var text = content.items.map(function (it) { return it.str; }).join(" ");
+      out.push(text);
+    }
+    return out.join("\n\n");
+  }
+
+  async function extractDocx(file) {
+    var buf = await file.arrayBuffer();
+    var result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+    return result.value || "";
+  }
+
+  el("cliente-file").addEventListener("change", async function (ev) {
+    var file = ev.target.files && ev.target.files[0];
+    var status = el("file-status");
+    if (!file) return;
+    var name = file.name || "arquivo";
+    var lower = name.toLowerCase();
+    status.className = "file-status";
+    status.textContent = "Lendo " + name + "…";
+    try {
+      var text;
+      if (lower.endsWith(".pdf") || file.type === "application/pdf") {
+        text = await extractPdf(file);
+      } else if (lower.endsWith(".docx") || file.type.indexOf("officedocument.wordprocessingml") !== -1) {
+        text = await extractDocx(file);
+      } else if (lower.endsWith(".doc")) {
+        throw new Error("DOC_LEGACY");
+      } else {
+        throw new Error("UNSUPPORTED");
+      }
+      text = (text || "").trim();
+      if (!text) throw new Error("EMPTY");
+      el("cliente-texto").value = text.slice(0, 20000);
+      status.className = "file-status ok";
+      status.textContent = "✓ " + name + " — " + text.length.toLocaleString("pt-BR") + " caracteres extraídos automaticamente. Revise o texto abaixo.";
+      updateProgress();
+    } catch (e) {
+      var msg = "Não foi possível ler esse arquivo automaticamente. Cole o conteúdo na caixa abaixo.";
+      if (e && e.message === "DOC_LEGACY") msg = "Arquivos .doc antigos não são lidos automaticamente. Salve como .docx ou PDF, ou cole o conteúdo abaixo.";
+      if (e && e.message === "UNSUPPORTED") msg = "Formato não suportado. Envie PDF ou DOCX, ou cole o conteúdo abaixo.";
+      if (e && e.message === "EMPTY") msg = "Não encontramos texto nesse arquivo (pode ser um PDF escaneado como imagem). Cole o conteúdo abaixo.";
+      status.className = "file-status err";
+      status.textContent = msg;
+    }
+  });
+
+  // ---------- prompt assembly ----------
+  function fieldBlock(title, value) {
+    var v = (value || "").trim();
+    if (!v) return "";
+    return "=== " + title + " ===\n" + v + "\n\n";
+  }
+
+  function assembleMaterial(extra) {
+    var s = "";
+    s += fieldBlock("CLIENTE IDEAL EXPANDIDO (documento)", cap(el("cliente-texto").value, 18000));
+    s += fieldBlock("DETALHAMENTO DO CLIENTE IDEAL", cap(el("detalhamento").value, 6000));
+    s += fieldBlock("ESSÊNCIA DA MARCA", cap(el("essencia").value, 4000));
+    s += fieldBlock("JORNADA DO HERÓI", cap(el("jornada").value, 4000));
+    s += fieldBlock("POSICIONAMENTO", cap(el("posicionamento").value, 2500));
+    s += fieldBlock("INFORMAÇÕES ADICIONAIS RELEVANTES", cap(el("info-adicional").value, 12000));
+    if (extra) s += fieldBlock("COMPLEMENTO ENVIADO PELO USUÁRIO APÓS A PRIMEIRA RODADA", cap(extra, 6000));
+    return s.trim();
+  }
+
+  // ---------- pipeline icon ----------
+  function arrowSvg() {
+    return '<svg viewBox="0 0 16 16" fill="none"><path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function novelaSvg() {
+    return '<svg viewBox="0 0 12 12" fill="none"><circle cx="2" cy="6" r="1.4" fill="currentColor"/><circle cx="6" cy="6" r="1.4" fill="currentColor"/><circle cx="10" cy="6" r="1.4" fill="currentColor"/></svg>';
+  }
+  function zigSvg() {
+    return '<svg viewBox="0 0 34 14" fill="none"><path d="M1 7h6l3-6 4 12 3-6h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  // ---------- rendering ----------
+  function chipList(items, cls) {
+    if (!items || !items.length) return "";
+    return '<div class="chip-row">' + items.map(function (t) {
+      return '<span class="chip' + (cls ? " " + cls : "") + '">' + esc(t) + "</span>";
+    }).join("") + "</div>";
+  }
+  function plainList(items) {
+    if (!items || !items.length) return "";
+    return '<ul class="plain-list">' + items.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
+  }
+
+  function renderMapa(m) {
+    m = m || {};
+    var panels = [];
+    if (m.situacoes && m.situacoes.length) panels.push({ h: "Situações recorrentes", body: plainList(m.situacoes) });
+    if (m.personagens && m.personagens.length) panels.push({ h: "Personagens", body: chipList(m.personagens) });
+    if (m.conflitos && m.conflitos.length) panels.push({ h: "Conflitos", body: plainList(m.conflitos) });
+    if (m.frasesReais && m.frasesReais.length) panels.push({ h: "Frases reais do público", body: chipList(m.frasesReais, "quote") });
+    if (m.historias && m.historias.length) panels.push({ h: "Histórias da marca", body: plainList(m.historias) });
+    if (m.bandeiras && m.bandeiras.length) panels.push({ h: "Bandeiras que a marca defende", body: chipList(m.bandeiras) });
+    if (m.inimigos && m.inimigos.length) panels.push({ h: "O que a marca rejeita", body: chipList(m.inimigos) });
+
+    var panelsHtml = '<div class="dossier">' + panels.map(function (p) {
+      return '<div class="dossier-panel"><h4>' + esc(p.h) + "</h4>" + p.body + "</div>";
+    }).join("") + "</div>";
+
+    var tensions = [];
+    (m.contradicoes || []).forEach(function (c) {
+      if (c && (c.quer || c.teme)) tensions.push({ want: c.quer, fear: c.teme, kind: "Contradição" });
+    });
+    var tensionRows = tensions.map(function (t) {
+      return '<div class="tension-row">' +
+        '<div class="tension-side want"><span class="k">Quer / diz</span>' + esc(t.want || "—") + "</div>" +
+        '<div class="tension-zig">' + zigSvg() + "</div>" +
+        '<div class="tension-side fear"><span class="k">Teme / faz</span>' + esc(t.fear || "—") + "</div>" +
+        "</div>";
+    }).join("");
+
+    var tensoesClienteMarca = (m.tensoesClienteMarca && m.tensoesClienteMarca.length)
+      ? '<div class="dossier-panel" style="margin-top:12px;"><h4>Tensões entre a visão da marca e o Cliente Ideal</h4>' + plainList(m.tensoesClienteMarca) + "</div>"
+      : "";
+
+    return (
+      '<div class="section-head"><span class="section-num">01</span><h2>Mapa de matéria-prima</h2></div>' +
+      '<p class="section-desc">A investigação organizada antes de qualquer quadro: cenas, gente, conflitos e as contradições que geram conteúdo.</p>' +
+      panelsHtml +
+      (tensionRows ? '<div class="dossier-panel" style="margin-top:12px;"><h4>Contradições (o que gera conflito)</h4>' + tensionRows + "</div>" : "") +
+      tensoesClienteMarca
+    );
+  }
+
+  function pipeNode(label, value) {
+    return '<div class="pipe-node"><span class="pk">' + esc(label) + '</span><span class="pv">' + esc(value || "—") + "</span></div>";
+  }
+
+  function renderQuadro(q, idx) {
+    q = q || {};
+    var pid = "Q" + String(idx + 1).padStart(2, "0");
+    var novela = q.efeitoNovela && String(q.efeitoNovela).toLowerCase() !== "null" && String(q.efeitoNovela).trim() !== ""
+      ? '<span class="novela-tag">' + novelaSvg() + " Efeito novela</span>"
+      : "";
+    var pipe = [
+      pipeNode("Pessoa", q.personagem),
+      pipeNode("Cena", q.situacao),
+      pipeNode("Conflito", q.conflito),
+      pipeNode("Identificação", q.identificacao),
+      pipeNode("Visão da marca", q.visaoDaMarca)
+    ].join('<span class="pipe-arrow">' + arrowSvg() + "</span>");
+
+    var eps = (q.exemplos || []).map(function (e, i) {
+      return '<li><span class="ep-num">EP.' + String(i + 1).padStart(2, "0") + "</span><span>" + esc(e) + "</span></li>";
+    }).join("");
+
+    return (
+      '<div class="quadro-card">' +
+        '<div class="qc-top"><div><div class="qc-id">' + pid + '</div><h3 class="qc-name">' + esc(q.nome || "Sem nome") + "</h3></div>" + novela + "</div>" +
+        '<p class="qc-concept">' + esc(q.conceito || "") + "</p>" +
+        '<div class="pipeline">' + pipe + "</div>" +
+        '<div class="qc-grid">' +
+          '<div class="qc-field"><div class="k">Por que existem muitos episódios</div><div class="v">' + esc(q.recorrencia || "—") + "</div></div>" +
+        "</div>" +
+        '<div class="episodes"><h5>Episódios possíveis</h5><ol>' + eps + "</ol></div>" +
+      "</div>"
+    );
+  }
+
+  var state = { lastData: null };
+
+  function renderRefine(perguntas) {
+    if (!perguntas || !perguntas.length) return "";
+    return (
+      '<div class="refine-box">' +
+        "<h3>Vale aprofundar antes de gravar</h3>" +
+        '<p class="lead">O material forneceu o suficiente para propor os quadros acima, mas estas respostas deixariam alguns ainda mais específicos:</p>' +
+        plainList(perguntas) +
+        '<textarea id="complemento" placeholder="Responda o que quiser das perguntas acima (ou traga outro detalhe) e gere uma nova versão."></textarea>' +
+        '<div class="refine-actions">' +
+          '<button type="button" class="solid-btn" id="refine-btn">Adicionar e gerar nova versão</button>' +
+          '<span class="go-note" id="refine-note"></span>' +
+        "</div>" +
+      "</div>"
+    );
+  }
+
+  function renderResult(data) {
+    state.lastData = data;
+    var quadros = (data.quadros || []).map(renderQuadro).join("");
+    var html =
+      renderMapa(data.mapaMateriaPrima) +
+      '<div class="section-head" style="margin-top:40px;"><span class="section-num">02</span><h2>Seus quadros</h2></div>' +
+      '<p class="section-desc">Cada quadro segue a fórmula pessoa + cena + conflito + identificação + visão da marca — é isso que transforma seguidor em audiência.</p>' +
+      '<div class="quadros-list">' + quadros + "</div>" +
+      renderRefine(data.perguntasRefinamento) +
+      '<div class="tools-row">' +
+        '<button type="button" class="ghost-btn" id="edit-btn">Editar informações</button>' +
+        '<button type="button" class="ghost-btn" id="download-btn">Baixar relatório (.md)</button>' +
+      "</div>";
+    el("results").innerHTML = html;
+    el("results").className = "on";
+
+    var editBtn = el("edit-btn");
+    if (editBtn) editBtn.addEventListener("click", function () {
+      document.getElementById("form").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    var dlBtn = el("download-btn");
+    if (dlBtn) dlBtn.addEventListener("click", downloadReport);
+    var refineBtn = el("refine-btn");
+    if (refineBtn) refineBtn.addEventListener("click", function () {
+      var extra = (el("complemento").value || "").trim();
+      var note = el("refine-note");
+      if (!extra) { note.textContent = "Escreva algo no campo acima antes de gerar de novo."; note.style.color = "var(--danger)"; return; }
+      generate(extra);
+    });
+
+    el("results").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function toMarkdown(data) {
+    var lines = ["# Grade de Quadros — Estrategista de Quadros", ""];
+    var m = data.mapaMateriaPrima || {};
+    lines.push("## Mapa de matéria-prima", "");
+    [["Situações recorrentes", m.situacoes], ["Conflitos", m.conflitos], ["Personagens", m.personagens],
+     ["Frases reais", m.frasesReais], ["Histórias", m.historias], ["Bandeiras", m.bandeiras],
+     ["Inimigos", m.inimigos], ["Tensões cliente x marca", m.tensoesClienteMarca]].forEach(function (pair) {
+      if (pair[1] && pair[1].length) {
+        lines.push("**" + pair[0] + "**");
+        pair[1].forEach(function (i) { lines.push("- " + i); });
+        lines.push("");
+      }
+    });
+    if (m.contradicoes && m.contradicoes.length) {
+      lines.push("**Contradições**");
+      m.contradicoes.forEach(function (c) { lines.push("- Quer/diz: " + (c.quer || "—") + " · Teme/faz: " + (c.teme || "—")); });
+      lines.push("");
+    }
+    lines.push("## Quadros", "");
+    (data.quadros || []).forEach(function (q, i) {
+      lines.push("### " + (i + 1) + ". " + (q.nome || ""));
+      lines.push(q.conceito || "");
+      lines.push("");
+      lines.push("- **Personagem:** " + (q.personagem || "—"));
+      lines.push("- **Situação:** " + (q.situacao || "—"));
+      lines.push("- **Conflito:** " + (q.conflito || "—"));
+      lines.push("- **Identificação:** " + (q.identificacao || "—"));
+      lines.push("- **Visão da marca:** " + (q.visaoDaMarca || "—"));
+      lines.push("- **Recorrência:** " + (q.recorrencia || "—"));
+      if (q.efeitoNovela && String(q.efeitoNovela).toLowerCase() !== "null") lines.push("- **Efeito novela:** " + q.efeitoNovela);
+      lines.push("");
+      lines.push("**Episódios possíveis:**");
+      (q.exemplos || []).forEach(function (e, j) { lines.push((j + 1) + ". " + e); });
+      lines.push("");
+    });
+    if (data.perguntasRefinamento && data.perguntasRefinamento.length) {
+      lines.push("## Perguntas para aprofundar", "");
+      data.perguntasRefinamento.forEach(function (p) { lines.push("- " + p); });
+    }
+    return lines.join("\n");
+  }
+
+  function downloadReport() {
+    if (!state.lastData) return;
+    var blob = new Blob([toMarkdown(state.lastData)], { type: "text/markdown;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "quadros.md";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  // ---------- generation ----------
+  async function generate(extra) {
+    el("tuning").className = "tuning on";
+    el("tuning-text").textContent = extra
+      ? "Sintonizando de novo… incorporando o complemento."
+      : "Sintonizando… lendo seu material e procurando contradições.";
+    el("go-btn").disabled = true;
+    showFormError("");
+
+    try {
+      var resp = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ material: assembleMaterial(extra), isRefinement: !!extra })
+      });
+      var payload = null;
+      try { payload = await resp.json(); } catch (parseErr) { payload = null; }
+
+      if (!resp.ok) {
+        var serverMsg = payload && payload.error;
+        throw new Error(serverMsg || "Falha ao gerar (HTTP " + resp.status + ").");
+      }
+      if (!payload || !Array.isArray(payload.quadros)) {
+        throw new Error("A resposta veio em um formato inesperado. Tente gerar de novo.");
+      }
+      renderResult(payload);
+    } catch (e) {
+      var msg = (e && e.message) || "Falha ao gerar. Verifique sua conexão e tente de novo.";
+      showFormError(msg);
+    } finally {
+      el("tuning").className = "tuning";
+      updateProgress();
+    }
+  }
+
+  function showFormError(msg) {
+    var existing = el("form-error");
+    if (existing) existing.remove();
+    if (!msg) return;
+    var span = document.createElement("span");
+    span.id = "form-error";
+    span.className = "form-error";
+    span.textContent = msg;
+    el("go-note").insertAdjacentElement("afterend", span);
+  }
+
+  el("form").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    generate(null);
+  });
+})();
+</script>
+</body>
+</html>

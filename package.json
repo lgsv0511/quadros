@@ -1,0 +1,17 @@
+{
+  "name": "estrategista-de-quadros",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ferramenta que transforma o material de uma marca e do Cliente Ideal em quadros recorrentes para Instagram, usando a API da Anthropic.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0"
+  }
+}
