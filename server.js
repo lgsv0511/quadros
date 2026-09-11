@@ -64,11 +64,19 @@ app.post("/api/generate", async (req, res) => {
 
   try {
     const prompt = buildPrompt(material, isRefinement);
-    const response = await anthropic.messages.create({
+    // Usamos streaming (em vez de messages.create simples) porque com
+    // MAX_TOKENS alto (necessário pelo "raciocínio interno" do sonnet-5) a
+    // API da Anthropic recusa a chamada não-streaming: "Streaming is
+    // required for operations that may take longer than 10 minutes". O
+    // helper .stream(...).finalMessage() consome o stream internamente e
+    // devolve o mesmo formato de objeto que messages.create, então o resto
+    // do código abaixo não precisa mudar.
+    const stream = anthropic.messages.stream({
       model: MODEL,
       max_tokens: MAX_TOKENS,
       messages: [{ role: "user", content: prompt }],
     });
+    const response = await stream.finalMessage();
 
     const textBlock = (response.content || []).find((b) => b.type === "text");
     const rawText = textBlock ? textBlock.text : "";
