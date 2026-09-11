@@ -18,7 +18,14 @@ if (!process.env.ANTHROPIC_API_KEY) {
 
 const PORT = Number(process.env.PORT || 3000);
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
-const MAX_TOKENS = Number(process.env.ANTHROPIC_MAX_TOKENS || 8000);
+// O claude-sonnet-5 usa "adaptive thinking" por padrão, e os tokens de
+// raciocínio interno contam dentro do mesmo limite de max_tokens (junto
+// com o texto de resposta). Como o prompt do Estrategista de Quadros pede
+// bastante raciocínio interno antes de gerar a grade (investigação de
+// contradições, mapa de matéria-prima etc.), um limite baixo faz a
+// resposta ser cortada no meio do JSON antes mesmo de terminar — por isso
+// o valor padrão aqui é bem mais folgado do que o mínimo necessário.
+const MAX_TOKENS = Number(process.env.ANTHROPIC_MAX_TOKENS || 32000);
 const RATE_LIMIT_PER_HOUR = Number(process.env.RATE_LIMIT_PER_HOUR || 20);
 
 const anthropic = new Anthropic({
@@ -68,7 +75,17 @@ app.post("/api/generate", async (req, res) => {
     const data = parseJsonLoose(rawText);
 
     if (!data || !Array.isArray(data.quadros)) {
-      console.error("[estrategista-de-quadros] Resposta da IA não pôde ser interpretada como JSON:", rawText.slice(0, 500));
+      console.error(
+        "[estrategista-de-quadros] Resposta da IA não pôde ser interpretada como JSON. stop_reason=%s tamanho_texto=%d prévia=%s",
+        response.stop_reason,
+        rawText.length,
+        rawText.slice(0, 500)
+      );
+      if (response.stop_reason === "max_tokens") {
+        return res.status(502).json({
+          error: "A resposta foi cortada por atingir o limite de tokens antes de terminar. Aumente ANTHROPIC_MAX_TOKENS no .env do servidor, ou tente novamente com um material um pouco mais enxuto.",
+        });
+      }
       return res.status(502).json({ error: "A resposta veio em um formato inesperado. Tente gerar de novo." });
     }
 
