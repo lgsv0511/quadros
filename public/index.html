@@ -7,72 +7,32 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
+  /* Paleta da identidade visual da Codirect: fundo preto, tipografia branca,
+     dourado/âmbar como destaque principal (a cor usada nos "CASE DE SUCESSO"
+     do Instagram @codirectbr) e um magenta/rosa do anel do perfil como
+     acento secundário. A marca é sempre escura — não varia com o tema do
+     sistema. */
   :root {
-    --bg: #E3E0D3;
-    --bg-2: #D9D5C5;
-    --surface: #FAF8F1;
-    --surface-2: #EFEBDD;
-    --ink: #1C1B15;
-    --ink-soft: #58543F;
-    --ink-faint: #86816A;
-    --line: #CDC7AE;
-    --line-strong: #B4AC8B;
-    --accent: #DA3B1A;
-    --accent-ink: #FFF9F0;
-    --accent-soft: #F3DBCF;
-    --accent-2: #1E6E5A;
-    --accent-2-ink: #F1FBF4;
-    --accent-2-soft: #D6E9DD;
-    --gold: #B4842A;
-    --gold-soft: #EBDCB6;
-    --danger: #B0281A;
-    --shadow: 0 1px 0 rgba(28,27,21,0.05);
-    --focus: #1E6E5A;
-    color-scheme: light;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #16150F;
-      --bg-2: #0F0E0A;
-      --surface: #1F1D15;
-      --surface-2: #29271C;
-      --ink: #ECE7D6;
-      --ink-soft: #B3AC90;
-      --ink-faint: #837D65;
-      --line: #3A3627;
-      --line-strong: #4C4732;
-      --accent: #FF7A4A;
-      --accent-ink: #1A0F09;
-      --accent-soft: #3E2417;
-      --accent-2: #56C79E;
-      --accent-2-ink: #08211A;
-      --accent-2-soft: #17342A;
-      --gold: #E4BC64;
-      --gold-soft: #3A2F13;
-      --danger: #FF8069;
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #16150F;
-    --bg-2: #0F0E0A;
-    --surface: #1F1D15;
-    --surface-2: #29271C;
-    --ink: #ECE7D6;
-    --ink-soft: #B3AC90;
-    --ink-faint: #837D65;
-    --line: #3A3627;
-    --line-strong: #4C4732;
-    --accent: #FF7A4A;
-    --accent-ink: #1A0F09;
-    --accent-soft: #3E2417;
-    --accent-2: #56C79E;
-    --accent-2-ink: #08211A;
-    --accent-2-soft: #17342A;
-    --gold: #E4BC64;
-    --gold-soft: #3A2F13;
-    --danger: #FF8069;
+    --bg: #0A0A09;
+    --bg-2: #000000;
+    --surface: #151412;
+    --surface-2: #1E1C19;
+    --ink: #F6F4EE;
+    --ink-soft: #B9B6AA;
+    --ink-faint: #7D7A6E;
+    --line: #2B2925;
+    --line-strong: #403D36;
+    --accent: #EFA93E;
+    --accent-ink: #1A1206;
+    --accent-soft: #3B2A0F;
+    --accent-2: #E23E7C;
+    --accent-2-ink: #FCEAF1;
+    --accent-2-soft: #3A1526;
+    --gold: #EFA93E;
+    --gold-soft: #3B2A0F;
+    --danger: #FF6B5E;
+    --shadow: 0 1px 0 rgba(0,0,0,0.3);
+    --focus: #EFA93E;
     color-scheme: dark;
   }
 
@@ -284,12 +244,14 @@
 
   <div class="topbar">
     <svg class="mark" viewBox="0 0 34 34" fill="none">
-      <rect x="1" y="1" width="32" height="32" rx="7" stroke="var(--ink)" stroke-width="1.4"/>
-      <path d="M8 12V9.5C8 8.67 8.67 8 9.5 8H12" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M26 12V9.5C26 8.67 25.33 8 24.5 8H22" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M8 22V24.5C8 25.33 8.67 26 9.5 26H12" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="M26 22V24.5C26 25.33 25.33 26 24.5 26H22" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
-      <circle cx="17" cy="17" r="4.2" fill="var(--accent)"/>
+      <defs>
+        <linearGradient id="markRing" x1="2" y1="6" x2="32" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="var(--accent-2)"/>
+          <stop offset="1" stop-color="var(--accent)"/>
+        </linearGradient>
+      </defs>
+      <circle cx="17" cy="17" r="15" stroke="url(#markRing)" stroke-width="2.2"/>
+      <path d="M20.5 12.2c-1-.9-2.3-1.4-3.7-1.4-3.3 0-6 2.8-6 6.2s2.7 6.2 6 6.2c1.4 0 2.7-.5 3.7-1.4" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
     <div class="brand-text">
       <span class="brand-name">ESTRATEGISTA DE QUADROS</span>
@@ -361,8 +323,6 @@
   </form>
 
   <div id="results"></div>
-
-  <footer class="note">As sugestões são geradas por IA a partir apenas do que você escreveu acima — vale revisar antes de gravar. Nada do que você digita aqui fica salvo se você recarregar a página; use “Baixar relatório” para guardar o resultado.</footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
@@ -485,60 +445,11 @@
   function novelaSvg() {
     return '<svg viewBox="0 0 12 12" fill="none"><circle cx="2" cy="6" r="1.4" fill="currentColor"/><circle cx="6" cy="6" r="1.4" fill="currentColor"/><circle cx="10" cy="6" r="1.4" fill="currentColor"/></svg>';
   }
-  function zigSvg() {
-    return '<svg viewBox="0 0 34 14" fill="none"><path d="M1 7h6l3-6 4 12 3-6h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  }
 
   // ---------- rendering ----------
-  function chipList(items, cls) {
-    if (!items || !items.length) return "";
-    return '<div class="chip-row">' + items.map(function (t) {
-      return '<span class="chip' + (cls ? " " + cls : "") + '">' + esc(t) + "</span>";
-    }).join("") + "</div>";
-  }
   function plainList(items) {
     if (!items || !items.length) return "";
     return '<ul class="plain-list">' + items.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
-  }
-
-  function renderMapa(m) {
-    m = m || {};
-    var panels = [];
-    if (m.situacoes && m.situacoes.length) panels.push({ h: "Situações recorrentes", body: plainList(m.situacoes) });
-    if (m.personagens && m.personagens.length) panels.push({ h: "Personagens", body: chipList(m.personagens) });
-    if (m.conflitos && m.conflitos.length) panels.push({ h: "Conflitos", body: plainList(m.conflitos) });
-    if (m.frasesReais && m.frasesReais.length) panels.push({ h: "Frases reais do público", body: chipList(m.frasesReais, "quote") });
-    if (m.historias && m.historias.length) panels.push({ h: "Histórias da marca", body: plainList(m.historias) });
-    if (m.bandeiras && m.bandeiras.length) panels.push({ h: "Bandeiras que a marca defende", body: chipList(m.bandeiras) });
-    if (m.inimigos && m.inimigos.length) panels.push({ h: "O que a marca rejeita", body: chipList(m.inimigos) });
-
-    var panelsHtml = '<div class="dossier">' + panels.map(function (p) {
-      return '<div class="dossier-panel"><h4>' + esc(p.h) + "</h4>" + p.body + "</div>";
-    }).join("") + "</div>";
-
-    var tensions = [];
-    (m.contradicoes || []).forEach(function (c) {
-      if (c && (c.quer || c.teme)) tensions.push({ want: c.quer, fear: c.teme, kind: "Contradição" });
-    });
-    var tensionRows = tensions.map(function (t) {
-      return '<div class="tension-row">' +
-        '<div class="tension-side want"><span class="k">Quer / diz</span>' + esc(t.want || "—") + "</div>" +
-        '<div class="tension-zig">' + zigSvg() + "</div>" +
-        '<div class="tension-side fear"><span class="k">Teme / faz</span>' + esc(t.fear || "—") + "</div>" +
-        "</div>";
-    }).join("");
-
-    var tensoesClienteMarca = (m.tensoesClienteMarca && m.tensoesClienteMarca.length)
-      ? '<div class="dossier-panel" style="margin-top:12px;"><h4>Tensões entre a visão da marca e o Cliente Ideal</h4>' + plainList(m.tensoesClienteMarca) + "</div>"
-      : "";
-
-    return (
-      '<div class="section-head"><span class="section-num">01</span><h2>Mapa de matéria-prima</h2></div>' +
-      '<p class="section-desc">A investigação organizada antes de qualquer quadro: cenas, gente, conflitos e as contradições que geram conteúdo.</p>' +
-      panelsHtml +
-      (tensionRows ? '<div class="dossier-panel" style="margin-top:12px;"><h4>Contradições (o que gera conflito)</h4>' + tensionRows + "</div>" : "") +
-      tensoesClienteMarca
-    );
   }
 
   function pipeNode(label, value) {
@@ -598,8 +509,7 @@
     state.lastData = data;
     var quadros = (data.quadros || []).map(renderQuadro).join("");
     var html =
-      renderMapa(data.mapaMateriaPrima) +
-      '<div class="section-head" style="margin-top:40px;"><span class="section-num">02</span><h2>Seus quadros</h2></div>' +
+      '<div class="section-head"><h2>Seus quadros</h2></div>' +
       '<p class="section-desc">Cada quadro segue a fórmula pessoa + cena + conflito + identificação + visão da marca — é isso que transforma seguidor em audiência.</p>' +
       '<div class="quadros-list">' + quadros + "</div>" +
       renderRefine(data.perguntasRefinamento) +
@@ -629,22 +539,6 @@
 
   function toMarkdown(data) {
     var lines = ["# Grade de Quadros — Estrategista de Quadros", ""];
-    var m = data.mapaMateriaPrima || {};
-    lines.push("## Mapa de matéria-prima", "");
-    [["Situações recorrentes", m.situacoes], ["Conflitos", m.conflitos], ["Personagens", m.personagens],
-     ["Frases reais", m.frasesReais], ["Histórias", m.historias], ["Bandeiras", m.bandeiras],
-     ["Inimigos", m.inimigos], ["Tensões cliente x marca", m.tensoesClienteMarca]].forEach(function (pair) {
-      if (pair[1] && pair[1].length) {
-        lines.push("**" + pair[0] + "**");
-        pair[1].forEach(function (i) { lines.push("- " + i); });
-        lines.push("");
-      }
-    });
-    if (m.contradicoes && m.contradicoes.length) {
-      lines.push("**Contradições**");
-      m.contradicoes.forEach(function (c) { lines.push("- Quer/diz: " + (c.quer || "—") + " · Teme/faz: " + (c.teme || "—")); });
-      lines.push("");
-    }
     lines.push("## Quadros", "");
     (data.quadros || []).forEach(function (q, i) {
       lines.push("### " + (i + 1) + ". " + (q.nome || ""));
