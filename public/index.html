@@ -447,11 +447,6 @@
   }
 
   // ---------- rendering ----------
-  function plainList(items) {
-    if (!items || !items.length) return "";
-    return '<ul class="plain-list">' + items.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
-  }
-
   function pipeNode(label, value) {
     return '<div class="pipe-node"><span class="pk">' + esc(label) + '</span><span class="pv">' + esc(value || "—") + "</span></div>";
   }
@@ -489,22 +484,6 @@
 
   var state = { lastData: null };
 
-  function renderRefine(perguntas) {
-    if (!perguntas || !perguntas.length) return "";
-    return (
-      '<div class="refine-box">' +
-        "<h3>Vale aprofundar antes de gravar</h3>" +
-        '<p class="lead">O material forneceu o suficiente para propor os quadros acima, mas estas respostas deixariam alguns ainda mais específicos:</p>' +
-        plainList(perguntas) +
-        '<textarea id="complemento" placeholder="Responda o que quiser das perguntas acima (ou traga outro detalhe) e gere uma nova versão."></textarea>' +
-        '<div class="refine-actions">' +
-          '<button type="button" class="solid-btn" id="refine-btn">Adicionar e gerar nova versão</button>' +
-          '<span class="go-note" id="refine-note"></span>' +
-        "</div>" +
-      "</div>"
-    );
-  }
-
   function renderResult(data) {
     state.lastData = data;
     var quadros = (data.quadros || []).map(renderQuadro).join("");
@@ -512,7 +491,6 @@
       '<div class="section-head"><h2>Seus quadros</h2></div>' +
       '<p class="section-desc">Cada quadro segue a fórmula pessoa + cena + conflito + identificação + visão da marca — é isso que transforma seguidor em audiência.</p>' +
       '<div class="quadros-list">' + quadros + "</div>" +
-      renderRefine(data.perguntasRefinamento) +
       '<div class="tools-row">' +
         '<button type="button" class="ghost-btn" id="edit-btn">Editar informações</button>' +
         '<button type="button" class="ghost-btn" id="download-btn">Baixar relatório (.md)</button>' +
@@ -526,13 +504,6 @@
     });
     var dlBtn = el("download-btn");
     if (dlBtn) dlBtn.addEventListener("click", downloadReport);
-    var refineBtn = el("refine-btn");
-    if (refineBtn) refineBtn.addEventListener("click", function () {
-      var extra = (el("complemento").value || "").trim();
-      var note = el("refine-note");
-      if (!extra) { note.textContent = "Escreva algo no campo acima antes de gerar de novo."; note.style.color = "var(--danger)"; return; }
-      generate(extra);
-    });
 
     el("results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -556,10 +527,6 @@
       (q.exemplos || []).forEach(function (e, j) { lines.push((j + 1) + ". " + e); });
       lines.push("");
     });
-    if (data.perguntasRefinamento && data.perguntasRefinamento.length) {
-      lines.push("## Perguntas para aprofundar", "");
-      data.perguntasRefinamento.forEach(function (p) { lines.push("- " + p); });
-    }
     return lines.join("\n");
   }
 
