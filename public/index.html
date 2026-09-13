@@ -53,11 +53,17 @@
   .wrap { max-width: 980px; margin: 0 auto; }
 
   /* ---------- Top bar ---------- */
-  .topbar { display: flex; align-items: center; gap: 14px; padding: 28px 0 22px; border-bottom: 1px solid var(--line); }
+  .topbar { display: flex; align-items: center; gap: 14px; padding: 28px 0 22px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
   .mark { width: 34px; height: 34px; flex: none; }
   .brand-text { display: flex; flex-direction: column; gap: 2px; }
   .brand-name { font-size: 1.05rem; font-weight: 900; letter-spacing: 0.02em; }
   .brand-tag { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; }
+  .cta-codirect {
+    margin-left: auto; font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 0.78rem; letter-spacing: 0.02em;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent)); color: var(--accent-2-ink); text-decoration: none;
+    border-radius: 9px; padding: 11px 18px; display: inline-flex; align-items: center; transition: transform .12s ease, opacity .12s ease;
+  }
+  .cta-codirect:hover { transform: translateY(-1px); opacity: 0.92; }
 
   /* ---------- Intro ---------- */
   .intro { padding: 32px 0 4px; }
@@ -257,6 +263,7 @@
       <span class="brand-name">ESTRATEGISTA DE QUADROS</span>
       <span class="brand-tag">Grade de programação para o seu Instagram</span>
     </div>
+    <a class="cta-codirect" href="http://www.codirect.com.br/formulario" target="_blank" rel="noopener">QUERO CONHECER O SERVIÇO DA CODIRECT</a>
   </div>
 
   <div class="intro">
